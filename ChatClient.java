@@ -16,9 +16,15 @@ public class ChatClient {
 			sock = new Socket(args[1], 10001);
 			pw = new PrintWriter(new OutputStreamWriter(sock.getOutputStream()));
 			br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+		
+			
+			
 			BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+			//BufferedReader는 문장을 바로 읽을 수 없음 여러 컨버터를 연결하는 것 처럼InputStreamReader가 젠더 역
+			
 			// send username.
 			pw.println(args[0]);
+			//system.out.println 과 같은 기능이지만 종착역만 다름.
 			pw.flush();
 			InputThread it = new InputThread(sock, br);
 			it.start();

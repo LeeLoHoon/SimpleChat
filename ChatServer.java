@@ -30,10 +30,11 @@ class ChatThread extends Thread{
 		this.sock = sock;
 		this.hm = hm;
 		try{
-			PrintWriter pw = new PrintWriter(new OutputStreamWriter(sock.getOutputStream()));
-			br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			PrintWriter pw = new PrintWriter(new OutputStreamWriter(sock.getOutputStream()));//출력하는 역할
+			
+			br = new BufferedReader(new InputStreamReader(sock.getInputStream()));//read line하는 역할
 			id = br.readLine();
-			broadcast(id + " entered.");
+			broadcast(id + " entered."); //개개인에 배당된 chattread가 모든 client들에게 전달
 			System.out.println("[Server] User (" + id + ") entered.");
 			synchronized(hm){
 				hm.put(this.id, pw);
