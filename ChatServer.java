@@ -124,7 +124,7 @@ class ChatThread extends Thread{
 	//함수 호출한 client의 pw 로 전체 hm의 keySet을 print pw를어떻게?
 	public void send_userlist(){
 		synchronized(hm) {
-			ArrayList<String> IdArray = hm.keySet();
+			ArrayList<String> IdArray =(ArrayList<String>) hm.keySet();
 			for(String Id:IdArray) {
 				pw.println(Id);
 			}
