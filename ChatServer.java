@@ -61,7 +61,7 @@ class ChatThread extends Thread{
 					sendmsg(line);
 //client로 부터 받아온 line이 /to 라면 sendmsg method 실행
 				}
-				else if(line.equals("/userlist") == 0) {
+				else if(line.equals("/userlist")) {
 					send_userlist();
 				}
 				else
