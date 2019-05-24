@@ -6,8 +6,8 @@ import java.util.*;
 //java.util package 안에 있는 class: Hashmap, Collection, Iterator
 //java.io package 안에 있는 class: BufferedReader, PrintWriter, OutoutStreamWriter, InputStremReader, 
 
-public class ChatServer {
-public static void main(String[] args) {
+public class ChatServer { //chatserver 의 instance는 언제 만들어지나? 안만들어짐.
+public static void main(String[] args) { // start 지점(class method/static method) - 객체없어도 실행가능
 try{
 			ServerSocket server = new ServerSocket(10001);//사용할 ip주소
 			System.out.println("Waiting connection...");
@@ -15,8 +15,7 @@ try{
 			while(true){
 				Socket sock = server.accept();
 				ChatThread chatthread = new ChatThread(sock, hm);
-//chatthread는 ChatThread의 instance 이며 ChatThread의 constructor로 생성됨
-(sock과 hm을 parameter로 받음)
+//chatthread는 ChatThread의 instance 이며 ChatThread의 constructor로 생성됨(sock과 hm을 parameter로 받음)
 				chatthread.start();
 //ChatThread class 는 Thread class 를 상속받는데 Thread class 안에 있는 start method를 통해 ChatThread에 override 되어있는 run method를 실행한다.
 			} // while
@@ -34,7 +33,7 @@ class ChatThread extends Thread{
 	private boolean initFlag = false;
 	public ChatThread(Socket sock, HashMap hm){
 		this.sock = sock;
-		this.hm = hm;
+		this.hm = hm; //main에 있는 hm의 reference를 가져옴 (실체 x)
 		try{
 			PrintWriter pw = new PrintWriter(new OutputStreamWriter(sock.getOutputStream()));//출력하는 역할
 			
@@ -44,7 +43,8 @@ class ChatThread extends Thread{
 			System.out.println("[Server] User (" + id + ") entered.");
 			synchronized(hm){
 				hm.put(this.id, pw);
-			}//동기화 기능 수행 hm이라는 instance에 들어오는 id와 printwriter를 hm에 저장 및 동기화
+			}//동기화 기능 수행 hm이라는 instance에 들어오는 id와 printwriter를 hm에 저장 및 동기화(이 과정이 없으면 충돌 발생--> 줄세우기)
+			//thread를 사용할때 가장 신경써야 하는 부분이 충돌
 			initFlag = true;
 		}catch(Exception ex){
 			System.out.println(ex);
@@ -60,7 +60,11 @@ class ChatThread extends Thread{
 				if(line.indexOf("/to ") == 0){
 					sendmsg(line);
 //client로 부터 받아온 line이 /to 라면 sendmsg method 실행
-				}else
+				}
+				else if(line.equals("/userlist") == 0) {
+					send_userlist();
+				}
+				else
 					broadcast(id + " : " + line);
 //그 외의 경우엔 모두 broadcast 실행
 			}//
@@ -91,7 +95,7 @@ class ChatThread extends Thread{
 			//start ~ end index 앞까지가 받을 client 명
 			String msg2 = msg.substring(end+1);
 			//두번째 blanck space 이후 부터가 보낼 message
-			Object obj = hm.get(to); 
+			Object obj = hm.get(to); //읽든 쓰든 sync를 쓰는게 안전.
 	      //hm안에 해당 id(client)가 있는지 확인하고 있다면 printwriter return 
 			if(obj != null){
 				PrintWriter pw = (PrintWriter)obj; 
@@ -116,5 +120,15 @@ class ChatThread extends Thread{
 //pw를 바꿔가면서 println 실행(존재하는 모든 pw에 println실행)
 		}
 	} // broadcast
+	
+	//함수 호출한 client의 pw 로 전체 hm의 keySet을 print pw를어떻게?
+	public void send_userlist(){
+		synchronized(hm) {
+			ArrayList<String> IdArray = hm.keySet();
+			for(String Id:IdArray) {
+				pw.println(Id);
+			}
+		}
+	}
 }
 
